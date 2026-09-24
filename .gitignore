@@ -1,0 +1,4 @@
+# Personal data never goes in this public repo.
+*.xlsx
+gymapp-backup*.json
+__pycache__/

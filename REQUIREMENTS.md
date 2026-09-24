@@ -6,7 +6,7 @@ Log reps and weight during the workout as fast as possible, for two people
 
 ## Platform
 - Installable web app (PWA) on the phone that works fully offline.
-- Data is stored only on the device (IndexedDB). No accounts and no backend.
+- Data is stored only on the device (localStorage, with persistent storage requested). No accounts and no backend.
 - Export and import a JSON backup file so data survives a phone change or a
   browser data wipe.
 - Hosted as static files (e.g. GitHub Pages). That is needed only to install
@@ -61,9 +61,12 @@ Log reps and weight during the workout as fast as possible, for two people
 ## Out of scope for v1
 Rest timer, progression suggestions, charts, RPE logging per set, cloud sync.
 
-## Open questions
-- Units: kg everywhere, or a kg/lb choice per exercise?
-- UI language: Spanish (same as the sheet) or English?
-- Default weight increment: 2.5 kg for barbell, 1–2 kg for dumbbells, one
-  stack step for machines?
-- Show a short history (last 2–3 sessions) under each exercise while logging?
+## Decisions
+- Units: kg everywhere.
+- UI language: English (program notes are translated during import).
+- Default weight steps: 2.5 kg barbell and cable, 2 kg dumbbell, 5 kg
+  machine. Editable per exercise.
+- Last 3 sessions of each exercise are shown while logging.
+- The repo is public, so logged numbers never go into it. The program
+  template is bundled with the app; the Excel history is converted to a
+  backup file that is imported on the phone.
