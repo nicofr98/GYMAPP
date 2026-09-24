@@ -108,10 +108,12 @@ def parse_sheet(ws, person_id):
     days = []
     sessions = {}
     day = None
+    day_no = 0
     for row in range(1, ws.max_row + 1):
         c = ws.cell(row, 3).value
         if isinstance(c, str) and c.startswith("DÍA"):
             n = int(re.search(r"DÍA (\d+)", c).group(1))
+            day_no = n
             day = {"id": f"{block_id}-d{n}", "name": DAY_NAMES.get(n, c), "exercises": []}
             days.append(day)
             continue
@@ -141,7 +143,6 @@ def parse_sheet(ws, person_id):
             "rest": translate_rest(str(ws.cell(row, 8).value or "")),
             "sub": (ws.cell(row, 25).value or "").strip(),
             "notes": NOTES_EN.get(note, note),
-            "video": "",
             "weightType": weight_type,
             "increment": increment_for(name),
         })
@@ -164,7 +165,7 @@ def parse_sheet(ws, person_id):
                 entry["flag"] = "Imported from Excel without weight. Check this."
             key = (week, day["id"])
             sessions.setdefault(key, {
-                "id": f"imp-{person_id}-w{week}-d{day['id'][-1]}",
+                "id": f"imp-{person_id}-w{week}-d{day_no}",
                 "personId": person_id,
                 "blockId": block_id,
                 "week": week,

@@ -21,7 +21,7 @@ Log reps and weight during the workout as fast as possible, for two people
 - **Block**: 8 weeks, and week 8 is a deload.
 - **Day**: 4 per week (Lower A, Upper A, Lower B, Upper B).
 - **Exercise slot**: name, warm-up sets, working sets, rep range, RPE target,
-  rest, substitute exercise, notes, and a YouTube link (optional).
+  rest, substitute exercise and notes.
 - Supersets (A1/A2) are grouped together.
 - Weight type for each exercise: `load`, `bodyweight` or `assisted`
   (for assisted, a higher number means easier).
@@ -36,12 +36,11 @@ Log reps and weight during the workout as fast as possible, for two people
 4. Logging a set moves the focus to the next set or exercise.
 5. The substitute can be swapped in for today with one tap. The log records
    which exercise was actually done.
-6. The notes and 🎬 YouTube link are one tap away on each exercise.
+6. The notes are one tap away on each exercise.
 7. The deload week shows fewer sets automatically (3→2, 2→1).
 
 ## Program editing / new blocks
 - Add, remove, reorder and edit exercises and all of their prescription fields.
-- Edit the YouTube link for each exercise (Nico provides the URLs).
 - Start a new block: copy the current program, then edit it. Old blocks stay
   in the history and can be read but not edited.
 
@@ -60,6 +59,9 @@ Log reps and weight during the workout as fast as possible, for two people
 
 ## Out of scope for v1
 Rest timer, progression suggestions, charts, RPE logging per set, cloud sync.
+
+## Later
+- YouTube link per exercise (Nico provides the URLs), shipped as its own feature.
 
 ## Decisions
 - Units: kg everywhere.

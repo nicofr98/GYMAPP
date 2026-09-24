@@ -2,3 +2,4 @@
 *.xlsx
 gymapp-backup*.json
 __pycache__/
+node_modules/

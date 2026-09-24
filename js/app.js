@@ -1,6 +1,6 @@
 import { load, save, uid, isValidState, requestPersistence, downloadBackup } from './store.js';
 import {
-  activeBlock, blocksOf, findSession, isDeload, setCount, entryDone, sessionDone,
+  activeBlock, blocksOf, findSession, isDeload, setCount, sessionDone,
   positionKey, history, suggestNext, formatSet, titleCase,
 } from './logic.js';
 
@@ -25,7 +25,11 @@ const dialog = document.getElementById('dialog');
 const h = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const today = () => new Date().toISOString().slice(0, 10);
+// Local calendar date; toISOString() would give tomorrow for late workouts west of UTC.
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 const round2 = (n) => Math.round(n * 100) / 100;
 
 function commit() {
@@ -180,12 +184,12 @@ function renderExercise(block, day, ex, next, ro) {
         <span class="num">${i + 1}</span>
         <div class="stepper">
           <button data-action="step" data-field="reps" data-d="-1" ${dis} aria-label="fewer reps">−</button>
-          <input data-field="reps" inputmode="numeric" pattern="[0-9]*" value="${s.reps ?? ''}" placeholder="reps" class="${s.suggested ? 'sug' : ''}" ${dis}>
+          <input data-field="reps" inputmode="numeric" pattern="[0-9]*" value="${h(s.reps)}" placeholder="reps" class="${s.suggested ? 'sug' : ''}" ${dis}>
           <button data-action="step" data-field="reps" data-d="1" ${dis} aria-label="more reps">+</button>
         </div>
         <div class="stepper">
           <button data-action="step" data-field="weight" data-d="-1" ${dis} aria-label="less weight">−</button>
-          <input data-field="weight" inputmode="decimal" value="${s.weight ?? ''}" placeholder="${wLabel}" class="${s.suggested ? 'sug' : ''}" ${dis}>
+          <input data-field="weight" inputmode="decimal" value="${h(s.weight)}" placeholder="${wLabel}" class="${s.suggested ? 'sug' : ''}" ${dis}>
           <button data-action="step" data-field="weight" data-d="1" ${dis} aria-label="more weight">+</button>
         </div>
         <button class="check" data-action="toggle" ${dis} aria-label="${s.done ? 'undo set' : 'log set'}">✓</button>
@@ -198,7 +202,6 @@ function renderExercise(block, day, ex, next, ro) {
         <h3>${ex.superset ? `<span class="chip">${h(ex.superset)}</span> ` : ''}${h(titleCase(name))}
           ${swapped ? `<small>sub for ${h(titleCase(ex.name))}</small>` : ''}</h3>
         <div class="icons">
-          ${ex.video ? `<a class="icon" href="${h(ex.video)}" target="_blank" rel="noopener" aria-label="video">▶</a>` : ''}
           ${ex.notes ? `<button class="icon" data-action="notes" data-ex="${ex.id}" aria-label="notes">i</button>` : ''}
           ${ex.sub && !ro ? `<button class="icon" data-action="swap" data-ex="${ex.id}" aria-label="swap exercise">⇄</button>` : ''}
         </div>
@@ -248,7 +251,7 @@ function renderProgram() {
             <li>
               <button class="exedit" data-action="editEx" data-di="${di}" data-ei="${ei}">
                 <b>${ex.superset ? h(ex.superset) + ' ' : ''}${h(titleCase(ex.name))}</b>
-                <small>${ex.sets} × ${h(ex.reps)} · RPE ${h(ex.rpe)} · ${h(ex.rest)}${ex.video ? ' · ▶' : ''}</small>
+                <small>${ex.sets} × ${h(ex.reps)} · RPE ${h(ex.rpe)} · ${h(ex.rest)}</small>
               </button>
               <button class="icon" data-action="moveEx" data-di="${di}" data-ei="${ei}" data-d="-1" aria-label="move up">↑</button>
               <button class="icon" data-action="moveEx" data-di="${di}" data-ei="${ei}" data-d="1" aria-label="move down">↓</button>
@@ -287,14 +290,14 @@ const EX_FIELDS = [
   ['name', 'Exercise', 'text'], ['superset', 'Superset (e.g. A1)', 'text'],
   ['sets', 'Working sets', 'number'], ['reps', 'Reps', 'text'], ['rpe', 'RPE', 'text'],
   ['warmup', 'Warm-up sets', 'text'], ['rest', 'Rest', 'text'], ['sub', 'Substitute', 'text'],
-  ['increment', '+/− step (kg)', 'number'], ['video', 'YouTube link', 'url'],
+  ['increment', '+/− step (kg)', 'number'],
 ];
 
 function openExerciseEditor(di, ei) {
   const block = viewedBlock();
   const isNew = ei == null;
   const ex = isNew
-    ? { id: uid(), name: '', superset: '', warmup: '0', sets: 3, reps: '8-12', rpe: '8', rest: '2 min', sub: '', notes: '', video: '', weightType: 'load', increment: 2.5 }
+    ? { id: uid(), name: '', superset: '', warmup: '0', sets: 3, reps: '8-12', rpe: '8', rest: '2 min', sub: '', notes: '', weightType: 'load', increment: 2.5 }
     : block.days[di].exercises[ei];
 
   dialog.innerHTML = `
@@ -309,7 +312,6 @@ function openExerciseEditor(di, ei) {
         </select>
       </label>
       <label>Notes<textarea name="notes" rows="3">${h(ex.notes)}</textarea></label>
-      <label class="check-label"><input type="checkbox" name="videoAll" checked> Use this video for every exercise with this name (both people)</label>
       <div class="row">
         ${isNew ? '' : '<button value="delete" class="danger" formnovalidate>Delete</button>'}
         <span class="spacer"></span>
@@ -329,6 +331,7 @@ function openExerciseEditor(di, ei) {
     }
     if (dialog.returnValue !== 'save') return;
     const data = Object.fromEntries(new FormData(form));
+    const oldName = ex.name;
     for (const [f, , type] of EX_FIELDS) ex[f] = type === 'number' ? Number(data[f]) || 0 : data[f].trim();
     ex.name = ex.name.toUpperCase();
     ex.sub = ex.sub.toUpperCase();
@@ -336,9 +339,11 @@ function openExerciseEditor(di, ei) {
     ex.sets = Math.max(1, Math.round(ex.sets));
     ex.weightType = data.weightType;
     ex.notes = data.notes.trim();
-    if (data.videoAll) {
-      for (const b of state.blocks) for (const d of b.days) for (const e of d.exercises) {
-        if (e.name === ex.name) e.video = ex.video;
+    // History is matched by name, so carry this person's logs over to the new name.
+    if (!isNew && oldName !== ex.name) {
+      for (const s of state.sessions) {
+        if (s.personId !== block.personId) continue;
+        for (const entry of Object.values(s.entries)) if (entry.name === oldName) entry.name = ex.name;
       }
     }
     if (isNew) block.days[di].exercises.push(ex);
@@ -401,14 +406,14 @@ const actions = {
   toggle(el) {
     const { block, day, ex, i } = setContext(el);
     const s = shownSet(block, day, ex, i);
+    if (!s.done && s.reps == null) {
+      el.closest('.set').querySelector('input[data-field=reps]').focus();
+      return;
+    }
     const { session, entry } = ensureEntry(block, ex);
     if (s.done) {
       entry.sets[i] = { ...entry.sets[i], done: false };
     } else {
-      if (s.reps == null) {
-        el.closest('.set').querySelector('[data-field=reps]').focus();
-        return;
-      }
       entry.sets[i] = { reps: s.reps, weight: s.weight, done: true };
       session.date ??= session.imported ? null : today();
       const next = nextOpenSet(block, day);
@@ -521,6 +526,8 @@ const changes = {
       alert(`Imported ${state.sessions.length} logged days.`);
     } catch (err) {
       alert(`Could not import: ${err.message}`);
+    } finally {
+      el.value = ''; // let the same file be picked again
     }
   },
   // Typed values in a set row.
@@ -529,8 +536,10 @@ const changes = {
     const s = shownSet(block, day, ex, i);
     const { entry } = ensureEntry(block, ex);
     const raw = el.value.replace(',', '.').trim();
-    const value = raw === '' ? null : round2(Math.max(0, Number(raw) || 0));
-    entry.sets[i] = { reps: s.reps, weight: s.weight, done: s.done, [el.dataset.field]: value };
+    const field = el.dataset.field;
+    const n = Math.max(0, Number(raw) || 0);
+    const value = raw === '' ? null : field === 'reps' ? Math.round(n) : round2(n);
+    entry.sets[i] = { reps: s.reps, weight: s.weight, done: s.done, [field]: value };
     commit();
   },
 };

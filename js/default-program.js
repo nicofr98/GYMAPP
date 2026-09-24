@@ -38,7 +38,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "HACK SQUAT",
        "notes": "Heavy set after warming up. Minimum depth: parallel.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -53,7 +52,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "HACK SQUAT",
        "notes": "~10% less weight than the top set.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -68,7 +66,6 @@ export const DEFAULT_STATE = {
        "rest": "2-3 min",
        "sub": "DUMBBELL RDL",
        "notes": "Hips back until max hamstring stretch. Neutral back.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -83,7 +80,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "LYING LEG CURL",
        "notes": "Lean the torso forward to stretch the hamstrings more. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -98,7 +94,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "SINGLE-LEG LEG EXTENSION",
        "notes": "1 s pause at the top. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -113,7 +108,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "CABLE HIP ABDUCTION",
        "notes": "Torso leaning forward = more glutes. Option: MACHINE HIP THRUST for direct glute max work.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -128,7 +122,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "LEG PRESS CALF PRESS",
        "notes": "1-2 s pause at the bottom in the stretch.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       }
@@ -149,7 +142,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "DUMBBELL BENCH PRESS",
        "notes": "Shoulder blades retracted, touch the chest every rep.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -164,7 +156,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "DUMBBELL BENCH PRESS",
        "notes": "~10% less weight than the top set.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -179,7 +170,6 @@ export const DEFAULT_STATE = {
        "rest": "2-3 min",
        "sub": "CHEST-SUPPORTED T-BAR ROW",
        "notes": "Torso at ~45°, no hip drive.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -194,7 +184,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "PULL-UP",
        "notes": "Drive the elbows toward the ribs.",
-       "video": "",
        "weightType": "bodyweight",
        "increment": 5
       },
@@ -209,7 +198,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "MACHINE SHOULDER PRESS",
        "notes": "Lower until the dumbbells are at ear height.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -224,7 +212,6 @@ export const DEFAULT_STATE = {
        "rest": "0 s → A2",
        "sub": "BAYESIAN CABLE CURL",
        "notes": "Superset with A2.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -239,7 +226,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "DUMBBELL OVERHEAD EXTENSION",
        "notes": "Get a full triceps stretch at the bottom.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -254,7 +240,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "CABLE LATERAL RAISE",
        "notes": "Raise out, not up. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       }
@@ -275,7 +260,6 @@ export const DEFAULT_STATE = {
        "rest": "2-3 min",
        "sub": "MACHINE HIP THRUST",
        "notes": "1 s pause at the top, chin tucked.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -290,7 +274,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "DUMBBELL WALKING LUNGE",
        "notes": "Long stride and leaning torso for more glutes.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -305,7 +288,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "LYING LEG CURL",
        "notes": "Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -320,7 +302,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "SINGLE-LEG LEG EXTENSION",
        "notes": "Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -335,7 +316,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "CABLE HIP ABDUCTION",
        "notes": "Control the lowering.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -350,7 +330,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "STANDING CALF RAISE",
        "notes": "1-2 s pause at the bottom.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       }
@@ -371,7 +350,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "INCLINE MACHINE PRESS",
        "notes": "Bench at 30-45°.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -386,7 +364,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "ASSISTED PULL-UP",
        "notes": "Full range, stretch at the top.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -401,7 +378,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "CHEST-SUPPORTED T-BAR ROW",
        "notes": "Squeeze the shoulder blades for 1 s.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -416,7 +392,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "PEC DECK",
        "notes": "Focus on the stretch. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -431,7 +406,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "DUMBBELL LATERAL RAISE",
        "notes": "Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -446,7 +420,6 @@ export const DEFAULT_STATE = {
        "rest": "0 s → A2",
        "sub": "ROPE CABLE CURL",
        "notes": "Superset with A2.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -461,7 +434,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "CABLE TRICEP PUSHDOWN",
        "notes": "Lower the bar behind the head for more stretch.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       }
@@ -492,7 +464,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "HACK SQUAT",
        "notes": "Heavy set after warming up. Minimum depth: parallel.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -507,7 +478,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "HACK SQUAT",
        "notes": "~10% less weight than the top set.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -522,7 +492,6 @@ export const DEFAULT_STATE = {
        "rest": "2-3 min",
        "sub": "DUMBBELL RDL",
        "notes": "Hips back until max hamstring stretch. Neutral back.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -537,7 +506,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "LYING LEG CURL",
        "notes": "Lean the torso forward to stretch the hamstrings more. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -552,7 +520,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "SINGLE-LEG LEG EXTENSION",
        "notes": "1 s pause at the top. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -567,7 +534,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "CABLE HIP ABDUCTION",
        "notes": "Torso leaning forward = more glutes. Option: MACHINE HIP THRUST for direct glute max work.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -582,7 +548,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "LEG PRESS CALF PRESS",
        "notes": "1-2 s pause at the bottom in the stretch.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       }
@@ -603,7 +568,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "DUMBBELL BENCH PRESS",
        "notes": "Shoulder blades retracted, touch the chest every rep.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -618,7 +582,6 @@ export const DEFAULT_STATE = {
        "rest": "3 min",
        "sub": "DUMBBELL BENCH PRESS",
        "notes": "~10% less weight than the top set.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -633,7 +596,6 @@ export const DEFAULT_STATE = {
        "rest": "2-3 min",
        "sub": "CHEST-SUPPORTED T-BAR ROW",
        "notes": "Torso at ~45°, no hip drive.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -648,7 +610,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "PULL-UP",
        "notes": "Drive the elbows toward the ribs.",
-       "video": "",
        "weightType": "assisted",
        "increment": 5
       },
@@ -663,7 +624,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "MACHINE SHOULDER PRESS",
        "notes": "Lower until the dumbbells are at ear height.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -678,7 +638,6 @@ export const DEFAULT_STATE = {
        "rest": "0 s → A2",
        "sub": "BAYESIAN CABLE CURL",
        "notes": "Superset with A2.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -693,7 +652,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "DUMBBELL OVERHEAD EXTENSION",
        "notes": "Get a full triceps stretch at the bottom.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -708,7 +666,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "CABLE LATERAL RAISE",
        "notes": "Raise out, not up. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       }
@@ -729,7 +686,6 @@ export const DEFAULT_STATE = {
        "rest": "2-3 min",
        "sub": "MACHINE HIP THRUST",
        "notes": "1 s pause at the top, chin tucked.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -744,7 +700,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "DUMBBELL WALKING LUNGE",
        "notes": "Long stride and leaning torso for more glutes.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -759,7 +714,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "LYING LEG CURL",
        "notes": "Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -774,7 +728,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "SINGLE-LEG LEG EXTENSION",
        "notes": "Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -789,7 +742,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "CABLE HIP ABDUCTION",
        "notes": "Control the lowering.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -804,7 +756,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "STANDING CALF RAISE",
        "notes": "1-2 s pause at the bottom.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       }
@@ -825,7 +776,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "INCLINE MACHINE PRESS",
        "notes": "Bench at 30-45°.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -840,7 +790,6 @@ export const DEFAULT_STATE = {
        "rest": "2 min",
        "sub": "ASSISTED PULL-UP",
        "notes": "Full range, stretch at the top.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -855,7 +804,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "CHEST-SUPPORTED T-BAR ROW",
        "notes": "Squeeze the shoulder blades for 1 s.",
-       "video": "",
        "weightType": "load",
        "increment": 5
       },
@@ -870,7 +818,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "PEC DECK",
        "notes": "Focus on the stretch. Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -885,7 +832,6 @@ export const DEFAULT_STATE = {
        "rest": "60-90 s",
        "sub": "DUMBBELL LATERAL RAISE",
        "notes": "Last set to failure.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       },
@@ -900,7 +846,6 @@ export const DEFAULT_STATE = {
        "rest": "0 s → A2",
        "sub": "ROPE CABLE CURL",
        "notes": "Superset with A2.",
-       "video": "",
        "weightType": "load",
        "increment": 2
       },
@@ -915,7 +860,6 @@ export const DEFAULT_STATE = {
        "rest": "90 s",
        "sub": "CABLE TRICEP PUSHDOWN",
        "notes": "Lower the bar behind the head for more stretch.",
-       "video": "",
        "weightType": "load",
        "increment": 2.5
       }

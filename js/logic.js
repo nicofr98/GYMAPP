@@ -72,8 +72,10 @@ export function suggestNext(state, personId) {
   let { week, di } = last;
   di += 1;
   if (di >= block.days.length) {
+    // Block finished: stay on its last day instead of wrapping around.
+    if (week >= block.weeks) return { week, dayId: block.days.at(-1).id };
     di = 0;
-    week = Math.min(week + 1, block.weeks);
+    week += 1;
   }
   return { week, dayId: block.days[di].id };
 }

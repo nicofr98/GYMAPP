@@ -1,5 +1,5 @@
 // Offline cache for the app shell. Bump VERSION whenever a file below changes.
-const VERSION = 'gymapp-v1';
+const VERSION = 'gymapp-v2';
 const FILES = [
   './', './index.html', './manifest.webmanifest', './css/app.css',
   './js/app.js', './js/store.js', './js/logic.js', './js/default-program.js',

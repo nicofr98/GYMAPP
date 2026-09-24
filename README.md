@@ -20,13 +20,15 @@ After the first load it works with no signal.
 - The app opens on the day after the last one you logged.
 - Grey numbers are last session's values: tap ✓ to log them, or adjust with
   −/+ first. The next set is highlighted, and supersets (A1/A2) alternate.
-- `i` shows the notes, ⇄ swaps in the substitute exercise, and ▶ opens the
-  video.
-- **Program** tab: edit exercises (including YouTube links), reorder them, and
-  start a new block.
+- `i` shows the notes, and ⇄ swaps in the substitute exercise.
+- **Program** tab: edit exercises, reorder them, and start a new block.
 - **Settings → Export backup** now and then. Data only lives on the phone.
 
 ## Development
+Run the tests with `npm test` (needs Node 20+). The browser test needs a
+one-time `npm install`; `npm run test:py` tests the Excel importer (needs
+`pip install openpyxl`).
+
 Serve the folder with any static server, e.g. `python3 -m http.server`, and
 open `http://localhost:8000`.
 
