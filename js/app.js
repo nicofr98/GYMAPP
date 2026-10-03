@@ -4,7 +4,7 @@ import {
   positionKey, history, suggestNext, formatSet, titleCase,
 } from './logic.js';
 
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 
 let state = load();
 const ui = {

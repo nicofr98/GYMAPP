@@ -6,6 +6,7 @@
   --text: #e8ecf1;
   --muted: #9aa4b2;
   --ok: #2fb67c;
+  --ok-fill: #2fb67c;
   --on-ok: #0b1f15;
   --danger: #ff6b6f;
   --warn: #f5a524;
@@ -15,6 +16,8 @@
   --accent: #1f7a4d;
   --on-accent: #ffffff;
   --accent-soft: #16281f;
+  --ring: none;   /* outline for a pale accent on a light page */
+  --shadow: none; /* lifts white cards off the light page */
   --r-sm: 6px;
   --r: 10px;
   --r-lg: 14px;
@@ -28,6 +31,34 @@
   --accent-soft: #2e1f27;
 }
 
+/* Light mode follows the phone setting. Same tokens, light values. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f3f4f6;
+    --surface: #ffffff;
+    --surface-2: #eceef2;
+    --line: #c7cdd5;
+    --text: #14181d;
+    --muted: #5b6573;
+    --ok: #1a7f52;
+    --ok-fill: #cdeedb;
+    --on-ok: #0f5c3a;
+    --danger: #c62f37;
+    --warn: #8a5300;
+    --warn-soft: #fbefd9;
+    --scrim: #14181d66;
+    --accent-soft: #e3f1e9;
+    --shadow: 0 1px 2px #14181d14;
+    color-scheme: light;
+  }
+  [data-accent="1"] {
+    --accent-soft: #fce8ef;
+    --ring: inset 0 0 0 1px #c46d8f;
+  }
+  .tabs { box-shadow: 0 -1px 0 var(--line); }
+  .set.next .stepper { background: var(--surface); }
+}
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -39,7 +70,7 @@ html, body {
 }
 
 main {
-  padding: 4px 12px calc(96px + env(safe-area-inset-bottom));
+  padding: 4px 8px calc(96px + env(safe-area-inset-bottom));
   max-width: 640px;
   margin: 0 auto;
 }
@@ -63,7 +94,7 @@ button, .button {
   touch-action: manipulation;
 }
 button:disabled { opacity: .45; }
-button.primary, .button.primary { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+button.primary, .button.primary { background: var(--accent); color: var(--on-accent); box-shadow: var(--ring); font-weight: 600; }
 button.danger { color: var(--danger); }
 button.ghost { background: none; }
 
@@ -88,7 +119,7 @@ svg.i { flex: none; }
   top: 0;
   z-index: 5;
   background: var(--bg);
-  padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+  padding: calc(8px + env(safe-area-inset-top)) 8px 8px;
 }
 
 .seg {
@@ -99,9 +130,10 @@ svg.i { flex: none; }
   background: var(--surface);
   border-radius: var(--r-lg);
   padding: 4px;
+  box-shadow: var(--shadow);
 }
 .seg button { flex: 1; background: none; color: var(--muted); font-weight: 600; }
-.seg button.on { background: var(--accent); color: var(--on-accent); }
+.seg button.on { background: var(--accent); color: var(--on-accent); box-shadow: var(--ring); }
 
 .tabs {
   position: fixed;
@@ -124,7 +156,7 @@ svg.i { flex: none; }
 }
 .tabs .ind { display: grid; place-items: center; width: 52px; height: 28px; border-radius: var(--r); }
 .tabs button.on { color: var(--text); font-weight: 600; }
-.tabs button.on .ind { background: var(--accent); color: var(--on-accent); }
+.tabs button.on .ind { background: var(--accent); color: var(--on-accent); box-shadow: var(--ring); }
 
 /* ---------- log ---------- */
 
@@ -150,12 +182,13 @@ svg.i { flex: none; }
   gap: 4px;
   padding: 0 12px;
   background: var(--surface);
+  box-shadow: var(--shadow);
   color: var(--muted);
   white-space: nowrap;
   font-size: 14px;
 }
 .days button .i { color: var(--ok); }
-.weeks button.on, .days button.on { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.weeks button.on, .days button.on { background: var(--accent); color: var(--on-accent); box-shadow: var(--ring); font-weight: 600; }
 .days button.on .i { color: inherit; }
 
 .dayname { font-size: 22px; font-weight: 600; margin: 16px 4px 12px; line-height: 1.25; }
@@ -171,6 +204,7 @@ svg.i { flex: none; }
   border-radius: var(--r-lg);
   padding: 12px 8px 8px;
   margin-bottom: 12px;
+  box-shadow: var(--shadow);
 }
 .exhead { display: flex; align-items: flex-start; gap: 4px; padding-left: 4px; }
 .exhead h3 { flex: 1; margin: 10px 0 0; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -213,7 +247,8 @@ svg.i { flex: none; }
 
 .stepper {
   display: grid;
-  grid-template-columns: var(--tap) 1fr var(--tap);
+  /* ± give up a few px on narrow phones so a value like 102.5 always fits. */
+  grid-template-columns: minmax(32px, var(--tap)) minmax(56px, 1fr) minmax(32px, var(--tap));
   height: var(--tap);
   border-radius: var(--r);
   background: var(--surface-2);
@@ -237,8 +272,8 @@ svg.i { flex: none; }
 .stepper input::placeholder { font-size: 12px; font-weight: 400; color: var(--muted); }
 
 .check { height: var(--tap); padding: 0; color: var(--muted); }
-.set.next .check { background: var(--accent); color: var(--on-accent); }
-.set.done .check { background: var(--ok); color: var(--on-ok); }
+.set.next .check { background: var(--accent); color: var(--on-accent); box-shadow: var(--ring); }
+.set.done .check { background: var(--ok-fill); color: var(--on-ok); box-shadow: none; }
 .set.done input { color: var(--ok); }
 
 /* Warm-up rows: outlined and quieter than working sets. */
@@ -263,6 +298,7 @@ svg.i { flex: none; }
   border-radius: var(--r-lg);
   padding: 16px;
   margin-bottom: 12px;
+  box-shadow: var(--shadow);
 }
 .card h3 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
 .card label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 12px; }

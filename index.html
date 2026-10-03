@@ -3,9 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111418">
+  <meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f3f4f6" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script>
+    // White status-bar text would vanish on the light page, so iOS gets its default (dark) style.
+    if (matchMedia('(prefers-color-scheme: light)').matches) {
+      document.querySelector('meta[name=apple-mobile-web-app-status-bar-style]').content = 'default';
+    }
+  </script>
   <meta name="apple-mobile-web-app-title" content="GymApp">
   <title>GymApp</title>
   <link rel="manifest" href="manifest.webmanifest">

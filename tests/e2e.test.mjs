@@ -64,8 +64,8 @@ after(async () => {
   server?.close();
 });
 
-async function openApp() {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block' });
+async function openApp(colorScheme = 'dark') {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block', colorScheme });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -239,6 +239,23 @@ test('each person has their own accent colour', { skip }, async () => {
   assert.equal(await accent(), '#1f7a4d');
   await page.click('[data-action=person][data-id=alexa]');
   assert.equal(await accent(), '#f5b8cb');
+});
+
+test('light mode follows the phone setting', { skip }, async () => {
+  const token = (page, name) => page.evaluate((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), name);
+  const dark = (await openApp('dark')).page;
+  assert.equal(await token(dark, '--bg'), '#111418');
+  assert.equal(await dark.evaluate(() => document.querySelector('meta[name=apple-mobile-web-app-status-bar-style]').content), 'black-translucent');
+
+  const { page, errors } = await openApp('light');
+  assert.equal(await token(page, '--bg'), '#f3f4f6');
+  assert.equal(await token(page, '--accent-soft'), '#e3f1e9');
+  assert.equal(await page.evaluate(() => document.querySelector('meta[name=apple-mobile-web-app-status-bar-style]').content), 'default');
+  // Alexa's pastel pink gets an outline so it still reads on white.
+  await page.click('[data-action=person][data-id=alexa]');
+  assert.equal(await token(page, '--accent-soft'), '#fce8ef');
+  assert.match(await page.locator('.seg button.on').evaluate((el) => getComputedStyle(el).boxShadow), /inset/);
+  assert.deepEqual(errors, []);
 });
 
 test('renaming an exercise keeps its history', { skip }, async () => {

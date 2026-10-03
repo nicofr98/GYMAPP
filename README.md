@@ -26,6 +26,7 @@ After the first load it works with no signal.
   same warm-up last session. Warm-ups are saved but don't count toward the day
   being done. **Remove** drops the last one if it isn't logged yet.
 - The colours follow the person: dark green for Nico, pastel pink for Alexa.
+- Light or dark follows the phone's appearance setting.
 - **Program** tab: edit exercises, reorder them, and start a new block.
 - **Settings → Export backup** now and then. Data only lives on the phone.
 
