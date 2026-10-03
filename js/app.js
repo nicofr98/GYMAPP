@@ -4,7 +4,7 @@ import {
   positionKey, history, suggestNext, formatSet, titleCase,
 } from './logic.js';
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 
 let state = load();
 const ui = {
@@ -31,6 +31,25 @@ const today = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 const round2 = (n) => Math.round(n * 100) / 100;
+
+// Line icons on a 24 grid, drawn in currentColor.
+const ICONS = {
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  swap: '<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+  check: '<path d="M5 12.5 10 17.5 19 7"/>',
+  minus: '<path d="M5 12h14"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  up: '<path d="M6 15l6-6 6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  alert: '<path d="M12 3.5 2.5 20h19L12 3.5z"/><path d="M12 10v4M12 17h.01"/>',
+  done: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',
+  log: '<path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/>',
+  program: '<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
+  settings: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+};
+const icon = (name, size = 20, stroke = 1.75) =>
+  `<svg class="i" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 
 function commit() {
   save(state);
@@ -74,19 +93,25 @@ function ensureEntry(block, ex) {
   return { session, entry: session.entries[ex.id] };
 }
 
+// Working sets live in entry.sets, warm-ups in entry.warmups.
+const listKey = (kind) => (kind === 'wu' ? 'warmups' : 'sets');
+
 function currentEntry(block, ex) {
   const s = findSession(state, person().id, block.id, ui.week, viewedDay(block).id);
   return s?.entries[ex.id];
 }
 
 // What a set row shows: what was entered, else the same set last time.
-function shownSet(block, day, ex, i) {
+// Warm-ups only copy the same warm-up, never a working set.
+function shownSet(block, day, ex, i, kind = 'set') {
   const entry = currentEntry(block, ex);
-  const own = entry?.sets[i];
+  const own = entry?.[listKey(kind)]?.[i];
   if (own) return { ...own, suggested: false };
   const name = entry?.name ?? ex.name;
-  const [last] = history(state, person().id, name, positionKey(state, person().id, block.id, ui.week, day.id), 1);
-  const prev = last?.entry.sets[i] ?? last?.entry.sets.filter(Boolean).at(-1);
+  const past = history(state, person().id, name, positionKey(state, person().id, block.id, ui.week, day.id), 3);
+  let prev;
+  if (kind === 'wu') prev = past.find((x) => x.entry.warmups?.[i])?.entry.warmups[i];
+  else prev = past[0]?.entry.sets[i] ?? past[0]?.entry.sets.filter(Boolean).at(-1);
   return { reps: prev?.reps ?? null, weight: prev?.weight ?? null, done: false, suggested: true };
 }
 
@@ -114,6 +139,8 @@ function nextOpenSet(block, day) {
 
 function render() {
   const p = person();
+  // Each person gets their own accent: dark green, then pastel pink.
+  document.documentElement.dataset.accent = String(Math.max(0, state.people.indexOf(p)) % 2);
   root.innerHTML = `
     <header class="top">
       <div class="seg people">
@@ -123,7 +150,7 @@ function render() {
     <main>${ui.tab === 'log' ? renderLog() : ui.tab === 'program' ? renderProgram() : renderSettings()}</main>
     <nav class="tabs">
       ${[['log', 'Log'], ['program', 'Program'], ['settings', 'Settings']].map(([id, label]) =>
-        `<button data-action="tab" data-id="${id}" class="${ui.tab === id ? 'on' : ''}">${label}</button>`).join('')}
+        `<button data-action="tab" data-id="${id}" class="${ui.tab === id ? 'on' : ''}"><span class="ind">${icon(id, 22)}</span>${label}</button>`).join('')}
     </nav>`;
   if (ui.scrollTo) {
     document.getElementById(ui.scrollTo)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -157,12 +184,36 @@ function renderLog() {
     <div class="days">
       ${block.days.map((d, i) => `
         <button data-action="day" data-i="${i}" class="${d.id === day.id ? 'on' : ''}">
-          ${sessionDone(findSession(state, pid, block.id, ui.week, d.id)) ? '✓ ' : ''}${h(d.name.replace(/\s*\(.*\)$/, ''))}</button>`).join('')}
+          ${sessionDone(findSession(state, pid, block.id, ui.week, d.id)) ? icon('check', 14, 2.25) : ''}${h(d.name.replace(/\s*\(.*\)$/, ''))}</button>`).join('')}
     </div>
-    <h2 class="dayname">${h(day.name)} · Week ${ui.week}${isDeload(block, ui.week) ? ' · <span class="chip warn">Deload: RPE 6-7</span>' : ''}
-      ${session?.date ? `<small>${session.date}</small>` : session?.imported ? '<small>from Excel</small>' : ''}</h2>
+    <h2 class="dayname">${h(day.name)} <small>· Week ${ui.week}</small>${isDeload(block, ui.week) ? ' <span class="chip warn">Deload · RPE 6-7</span>' : ''}
+      ${session?.date ? `<small>· ${session.date}</small>` : session?.imported ? '<small>· from Excel</small>' : ''}</h2>
     ${day.exercises.map((ex) => renderExercise(block, day, ex, next, ro)).join('') || '<p class="empty">No exercises on this day.</p>'}
-    ${!ro && !next && day.exercises.length ? `<p class="finished">Day complete 💪</p>` : ''}`;
+    ${!ro && !next && day.exercises.length ? `<p class="finished">${icon('done', 22)}Day complete</p>` : ''}`;
+}
+
+function renderSetRow(block, day, ex, i, kind, isNext, ro) {
+  const s = shownSet(block, day, ex, i, kind);
+  const wu = kind === 'wu';
+  const wt = ex.weightType;
+  const wLabel = wt === 'assisted' ? 'assist kg' : wt === 'bodyweight' ? '+kg' : 'kg';
+  const dis = ro ? 'disabled' : '';
+  const what = wu ? 'warm-up set' : 'set';
+  return `
+    <div class="set ${wu ? 'wu' : ''} ${s.done ? 'done' : ''} ${isNext ? 'next' : ''}" id="${wu ? 'wu' : 'set'}-${ex.id}-${i}" data-ex="${ex.id}" data-i="${i}" data-kind="${kind}">
+      <span class="num">${wu ? 'W' : ''}${i + 1}</span>
+      <div class="stepper">
+        <button data-action="step" data-field="reps" data-d="-1" ${dis} aria-label="fewer reps">${icon('minus', 18)}</button>
+        <input data-field="reps" inputmode="numeric" pattern="[0-9]*" value="${h(s.reps)}" placeholder="reps" aria-label="reps" class="${s.suggested ? 'sug' : ''}" ${dis}>
+        <button data-action="step" data-field="reps" data-d="1" ${dis} aria-label="more reps">${icon('plus', 18)}</button>
+      </div>
+      <div class="stepper">
+        <button data-action="step" data-field="weight" data-d="-1" ${dis} aria-label="less weight">${icon('minus', 18)}</button>
+        <input data-field="weight" inputmode="decimal" value="${h(s.weight)}" placeholder="${wLabel}" aria-label="${wLabel}" class="${s.suggested ? 'sug' : ''}" ${dis}>
+        <button data-action="step" data-field="weight" data-d="1" ${dis} aria-label="more weight">${icon('plus', 18)}</button>
+      </div>
+      <button class="check" data-action="toggle" ${dis} aria-label="${s.done ? `undo ${what}` : `log ${what}`}">${icon('check', 20, s.done || isNext ? 2.25 : 1.75)}</button>
+    </div>`;
 }
 
 function renderExercise(block, day, ex, next, ro) {
@@ -172,45 +223,35 @@ function renderExercise(block, day, ex, next, ro) {
   const n = setCount(ex, block, ui.week);
   const hist = history(state, person().id, name, positionKey(state, person().id, block.id, ui.week, day.id), 3);
   const wt = ex.weightType;
-  const wLabel = wt === 'assisted' ? 'assist kg' : wt === 'bodyweight' ? '+kg' : 'kg';
   const rpe = isDeload(block, ui.week) ? '6-7' : ex.rpe;
+  const warmups = entry?.warmups ?? [];
+  const lastWu = warmups.at(-1);
 
-  const rows = Array.from({ length: n }, (_, i) => {
-    const s = shownSet(block, day, ex, i);
-    const isNext = next && next.ex.id === ex.id && next.i === i;
-    const dis = ro ? 'disabled' : '';
-    return `
-      <div class="set ${s.done ? 'done' : ''} ${isNext ? 'next' : ''}" id="set-${ex.id}-${i}" data-ex="${ex.id}" data-i="${i}">
-        <span class="num">${i + 1}</span>
-        <div class="stepper">
-          <button data-action="step" data-field="reps" data-d="-1" ${dis} aria-label="fewer reps">−</button>
-          <input data-field="reps" inputmode="numeric" pattern="[0-9]*" value="${h(s.reps)}" placeholder="reps" class="${s.suggested ? 'sug' : ''}" ${dis}>
-          <button data-action="step" data-field="reps" data-d="1" ${dis} aria-label="more reps">+</button>
-        </div>
-        <div class="stepper">
-          <button data-action="step" data-field="weight" data-d="-1" ${dis} aria-label="less weight">−</button>
-          <input data-field="weight" inputmode="decimal" value="${h(s.weight)}" placeholder="${wLabel}" class="${s.suggested ? 'sug' : ''}" ${dis}>
-          <button data-action="step" data-field="weight" data-d="1" ${dis} aria-label="more weight">+</button>
-        </div>
-        <button class="check" data-action="toggle" ${dis} aria-label="${s.done ? 'undo set' : 'log set'}">✓</button>
-      </div>`;
-  }).join('');
+  const wuRows = warmups.map((_, i) => renderSetRow(block, day, ex, i, 'wu', false, ro)).join('');
+  const rows = Array.from({ length: n }, (_, i) =>
+    renderSetRow(block, day, ex, i, 'set', next && next.ex.id === ex.id && next.i === i, ro)).join('');
 
   return `
     <section class="ex" id="ex-${ex.id}">
       <div class="exhead">
-        <h3>${ex.superset ? `<span class="chip">${h(ex.superset)}</span> ` : ''}${h(titleCase(name))}
+        <h3>${ex.superset ? `<span class="chip">${h(ex.superset)}</span> ` : ''}${h(titleCase(name))} <span class="rxh">· ${n} × ${h(ex.reps)}</span>
           ${swapped ? `<small>sub for ${h(titleCase(ex.name))}</small>` : ''}</h3>
         <div class="icons">
-          ${ex.notes ? `<button class="icon" data-action="notes" data-ex="${ex.id}" aria-label="notes">i</button>` : ''}
-          ${ex.sub && !ro ? `<button class="icon" data-action="swap" data-ex="${ex.id}" aria-label="swap exercise">⇄</button>` : ''}
+          ${ex.notes ? `<button class="icon ${ui.openNotes.has(ex.id) ? 'on' : ''}" data-action="notes" data-ex="${ex.id}" aria-label="notes">${icon('info')}</button>` : ''}
+          ${ex.sub && !ro ? `<button class="icon ${swapped ? 'on' : ''}" data-action="swap" data-ex="${ex.id}" aria-label="swap exercise">${icon('swap')}</button>` : ''}
         </div>
       </div>
-      <div class="rx">${n} × ${h(ex.reps)} · RPE ${h(rpe)} · ${h(ex.rest)}${ex.warmup && ex.warmup !== '0' ? ` · WU ${h(ex.warmup)}` : ''}${ex.sub && !swapped ? ` · alt: ${h(titleCase(ex.sub))}` : ''}</div>
+      <div class="rx">RPE ${h(rpe)} · ${h(ex.rest)}${ex.warmup && ex.warmup !== '0' ? ` · Warm-up ${h(ex.warmup)}` : ''}${ex.sub && !swapped ? ` · alt ${h(titleCase(ex.sub))}` : ''}</div>
       ${ui.openNotes.has(ex.id) ? `<p class="notes">${h(ex.notes)}</p>` : ''}
       ${hist.length ? `<div class="hist">${hist.map(({ session, entry }) =>
         `<span><b>W${session.week}${session.blockId !== block.id ? '*' : ''}</b> ${entry.sets.filter((s) => s?.done).map((s) => formatSet(s, wt)).join(' ')}</span>`).join('')}</div>` : ''}
-      ${entry?.flag ? `<p class="flag">⚠ ${h(entry.flag)} <button data-action="clearflag" data-ex="${ex.id}">OK</button></p>` : ''}
+      ${entry?.flag ? `<p class="flag">${icon('alert', 18)}<span>${h(entry.flag)}</span><button data-action="clearflag" data-ex="${ex.id}">OK</button></p>` : ''}
+      ${warmups.length ? `<div class="label">Warm-up</div>${wuRows}` : ''}
+      ${ro ? '' : `<div class="wuctl">
+        <button data-action="addWarmup" data-ex="${ex.id}">${icon('plus', 18)}Warm-up</button>
+        ${warmups.length && !lastWu?.done ? `<button data-action="removeWarmup" data-ex="${ex.id}">Remove</button>` : ''}
+      </div>`}
+      <div class="label">${n === 1 ? 'Working set' : 'Working sets'}</div>
       ${rows}
     </section>`;
 }
@@ -242,24 +283,24 @@ function renderProgram() {
       <section class="card">
         <div class="row">
           <input class="dayinput" data-change="dayName" data-di="${di}" value="${h(d.name)}">
-          <button class="icon" data-action="moveDay" data-di="${di}" data-d="-1" aria-label="move day up">↑</button>
-          <button class="icon" data-action="moveDay" data-di="${di}" data-d="1" aria-label="move day down">↓</button>
-          <button class="icon danger" data-action="delDay" data-di="${di}" aria-label="delete day">✕</button>
+          <button class="icon" data-action="moveDay" data-di="${di}" data-d="-1" aria-label="move day up">${icon('up')}</button>
+          <button class="icon" data-action="moveDay" data-di="${di}" data-d="1" aria-label="move day down">${icon('down')}</button>
+          <button class="icon danger" data-action="delDay" data-di="${di}" aria-label="delete day">${icon('x')}</button>
         </div>
         <ol class="exlist">
           ${d.exercises.map((ex, ei) => `
             <li>
               <button class="exedit" data-action="editEx" data-di="${di}" data-ei="${ei}">
-                <b>${ex.superset ? h(ex.superset) + ' ' : ''}${h(titleCase(ex.name))}</b>
-                <small>${ex.sets} × ${h(ex.reps)} · RPE ${h(ex.rpe)} · ${h(ex.rest)}</small>
+                <b>${ex.superset ? h(ex.superset) + ' ' : ''}${h(titleCase(ex.name))} <span>· ${ex.sets} × ${h(ex.reps)}</span></b>
+                <small>${ex.warmup && ex.warmup !== '0' ? `Warm-up ${h(ex.warmup)} · ` : ''}RPE ${h(ex.rpe)} · ${h(ex.rest)}</small>
               </button>
-              <button class="icon" data-action="moveEx" data-di="${di}" data-ei="${ei}" data-d="-1" aria-label="move up">↑</button>
-              <button class="icon" data-action="moveEx" data-di="${di}" data-ei="${ei}" data-d="1" aria-label="move down">↓</button>
+              <button class="icon" data-action="moveEx" data-di="${di}" data-ei="${ei}" data-d="-1" aria-label="move up">${icon('up')}</button>
+              <button class="icon" data-action="moveEx" data-di="${di}" data-ei="${ei}" data-d="1" aria-label="move down">${icon('down')}</button>
             </li>`).join('')}
         </ol>
-        <button data-action="addEx" data-di="${di}">+ Add exercise</button>
+        <button data-action="addEx" data-di="${di}">${icon('plus', 18)}Add exercise</button>
       </section>`).join('')}
-    <button data-action="addDay">+ Add day</button>`;
+    <button data-action="addDay">${icon('plus', 18)}Add day</button>`;
 }
 
 function renderSettings() {
@@ -289,7 +330,7 @@ function renderSettings() {
 const EX_FIELDS = [
   ['name', 'Exercise', 'text'], ['superset', 'Superset (e.g. A1)', 'text'],
   ['sets', 'Working sets', 'number'], ['reps', 'Reps', 'text'], ['rpe', 'RPE', 'text'],
-  ['warmup', 'Warm-up sets', 'text'], ['rest', 'Rest', 'text'], ['sub', 'Substitute', 'text'],
+  ['warmup', 'Warm-up sets (guide)', 'text'], ['rest', 'Rest', 'text'], ['sub', 'Substitute', 'text'],
   ['increment', '+/− step (kg)', 'number'],
 ];
 
@@ -394,31 +435,46 @@ const actions = {
     render();
   },
   step(el) {
-    const { block, day, ex, i } = setContext(el);
-    const s = shownSet(block, day, ex, i);
-    const { entry } = ensureEntry(block, ex);
+    const { block, day, ex, i, kind } = setContext(el);
+    const s = shownSet(block, day, ex, i, kind);
+    const list = setList(block, ex, kind);
     const field = el.dataset.field;
     const step = field === 'reps' ? 1 : ex.increment || 1;
     const value = round2(Math.max(0, (s[field] ?? 0) + Number(el.dataset.d) * step));
-    entry.sets[i] = { reps: s.reps, weight: s.weight, done: s.done, [field]: value };
+    list[i] = { reps: s.reps, weight: s.weight, done: s.done, [field]: value };
     commit();
   },
   toggle(el) {
-    const { block, day, ex, i } = setContext(el);
-    const s = shownSet(block, day, ex, i);
+    const { block, day, ex, i, kind } = setContext(el);
+    const s = shownSet(block, day, ex, i, kind);
     if (!s.done && s.reps == null) {
       el.closest('.set').querySelector('input[data-field=reps]').focus();
       return;
     }
-    const { session, entry } = ensureEntry(block, ex);
+    const list = setList(block, ex, kind);
     if (s.done) {
-      entry.sets[i] = { ...entry.sets[i], done: false };
+      list[i] = { ...list[i], done: false };
     } else {
-      entry.sets[i] = { reps: s.reps, weight: s.weight, done: true };
+      list[i] = { reps: s.reps, weight: s.weight, done: true };
+      const session = findSession(state, person().id, block.id, ui.week, day.id);
       session.date ??= session.imported ? null : today();
-      const next = nextOpenSet(block, day);
+      const next = kind === 'set' && nextOpenSet(block, day);
       if (next) ui.scrollTo = `set-${next.ex.id}-${next.i}`;
     }
+    commit();
+  },
+  addWarmup(el) {
+    const block = viewedBlock();
+    const ex = viewedDay(block).exercises.find((e) => e.id === el.dataset.ex);
+    // null = not touched yet, so the row shows last session's value as a suggestion.
+    setList(block, ex, 'wu').push(null);
+    commit();
+  },
+  removeWarmup(el) {
+    const block = viewedBlock();
+    const ex = viewedDay(block).exercises.find((e) => e.id === el.dataset.ex);
+    const list = setList(block, ex, 'wu');
+    if (!list.at(-1)?.done) list.pop();
     commit();
   },
   swap(el) {
@@ -427,6 +483,7 @@ const actions = {
     const { entry } = ensureEntry(block, ex);
     entry.name = entry.name === ex.name ? ex.sub : ex.name;
     entry.sets = entry.sets.map((s) => (s?.done ? s : null));
+    if (entry.warmups) entry.warmups = entry.warmups.map((s) => (s?.done ? s : null));
     commit();
   },
   clearflag(el) {
@@ -532,14 +589,14 @@ const changes = {
   },
   // Typed values in a set row.
   setField(el) {
-    const { block, day, ex, i } = setContext(el);
-    const s = shownSet(block, day, ex, i);
-    const { entry } = ensureEntry(block, ex);
+    const { block, day, ex, i, kind } = setContext(el);
+    const s = shownSet(block, day, ex, i, kind);
+    const list = setList(block, ex, kind);
     const raw = el.value.replace(',', '.').trim();
     const field = el.dataset.field;
     const n = Math.max(0, Number(raw) || 0);
     const value = raw === '' ? null : field === 'reps' ? Math.round(n) : round2(n);
-    entry.sets[i] = { reps: s.reps, weight: s.weight, done: s.done, [field]: value };
+    list[i] = { reps: s.reps, weight: s.weight, done: s.done, [field]: value };
     commit();
   },
 };
@@ -555,7 +612,13 @@ function setContext(el) {
   const block = viewedBlock();
   const day = viewedDay(block);
   const ex = day.exercises.find((e) => e.id === row.dataset.ex);
-  return { block, day, ex, i: Number(row.dataset.i) };
+  return { block, day, ex, i: Number(row.dataset.i), kind: row.dataset.kind };
+}
+
+// The entry's working sets or warm-ups, created on first write.
+function setList(block, ex, kind) {
+  const { entry } = ensureEntry(block, ex);
+  return (entry[listKey(kind)] ??= []);
 }
 
 root.addEventListener('click', (e) => {

@@ -20,7 +20,12 @@ After the first load it works with no signal.
 - The app opens on the day after the last one you logged.
 - Grey numbers are last session's values: tap ✓ to log them, or adjust with
   −/+ first. The next set is highlighted, and supersets (A1/A2) alternate.
-- `i` shows the notes, and ⇄ swaps in the substitute exercise.
+- The (i) button shows the notes, and the arrows button swaps in the
+  substitute exercise.
+- **+ Warm-up** adds a warm-up set above the working sets, pre-filled from the
+  same warm-up last session. Warm-ups are saved but don't count toward the day
+  being done. **Remove** drops the last one if it isn't logged yet.
+- The colours follow the person: dark green for Nico, pastel pink for Alexa.
 - **Program** tab: edit exercises, reorder them, and start a new block.
 - **Settings → Export backup** now and then. Data only lives on the phone.
 

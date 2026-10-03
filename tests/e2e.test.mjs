@@ -176,7 +176,7 @@ test('swap to substitute uses its own history and can swap back', { skip }, asyn
   await go(page, 1, 0);
   const squat = page.locator('.ex').first();
   await squat.locator('[data-action=swap]').click();
-  assert.match(await squat.locator('h3').textContent(), /Hack Squat\s+sub for Back Squat \(Top Set\)/);
+  assert.match(await squat.locator('h3').textContent(), /Hack Squat · 1 × 4-6\s+sub for Back Squat \(Top Set\)/);
   await squat.locator('[data-action=swap]').click();
   assert.doesNotMatch(await squat.locator('h3').textContent(), /Hack Squat/);
 });
@@ -187,6 +187,58 @@ test('switching person keeps week and day; deload shows fewer sets', { skip }, a
   await page.click('[data-action=person][data-id=alexa]');
   assert.match(await page.textContent('.dayname'), /Lower B .* Week 8 .*Deload/);
   assert.equal(await page.locator('.ex').first().locator('.set').count(), 2); // 3 sets → 2
+});
+
+test('warm-ups: added on demand, saved, pre-filled next time, removable', { skip }, async () => {
+  const { page, errors } = await openApp();
+  await go(page, 1, 0);
+  const squat = page.locator('.ex').first();
+  const wu = () => squat.locator('.set.wu');
+  const work = () => squat.locator('.set:not(.wu)');
+  const type = async (r, field, value) => {
+    await r.locator(`input[data-field=${field}]`).fill(value);
+    await r.locator(`input[data-field=${field}]`).press('Enter');
+  };
+  assert.equal(await wu().count(), 0, 'no warm-up rows by default');
+
+  await squat.locator('[data-action=addWarmup]').click();
+  assert.equal(await wu().count(), 1);
+  assert.equal(await wu().first().locator('.num').textContent(), 'W1');
+  await type(wu().first(), 'reps', '5');
+  await type(wu().first(), 'weight', '60');
+  await wu().first().locator('[data-action=toggle]').click();
+  assert.match(await wu().first().getAttribute('class'), /done/);
+  // A warm-up never becomes the next set or completes the day.
+  assert.match(await work().first().getAttribute('class'), /next/);
+  assert.equal(await page.locator('[data-action=day][data-i="0"] svg').count(), 0);
+
+  await type(work().first(), 'reps', '5');
+  await type(work().first(), 'weight', '100');
+  await work().first().locator('[data-action=toggle]').click();
+
+  await page.reload();
+  await go(page, 1, 0);
+  assert.equal(await wu().count(), 1);
+  assert.equal(await val(wu().first(), 'weight'), '60');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('gymapp.v1')));
+  assert.deepEqual(Object.values(saved.sessions[0].entries)[0].warmups, [{ reps: 5, weight: 60, done: true }]);
+
+  // Next week the same warm-up is suggested, and an unlogged one can be removed.
+  await go(page, 2, 0);
+  await squat.locator('[data-action=addWarmup]').click();
+  assert.equal(await val(wu().first(), 'weight'), '60');
+  assert.equal(await wu().first().locator('input.sug').count(), 2);
+  await squat.locator('[data-action=removeWarmup]').click();
+  assert.equal(await wu().count(), 0);
+  assert.deepEqual(errors, []);
+});
+
+test('each person has their own accent colour', { skip }, async () => {
+  const { page } = await openApp();
+  const accent = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
+  assert.equal(await accent(), '#1f7a4d');
+  await page.click('[data-action=person][data-id=alexa]');
+  assert.equal(await accent(), '#f5b8cb');
 });
 
 test('renaming an exercise keeps its history', { skip }, async () => {
